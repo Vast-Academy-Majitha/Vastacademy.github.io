@@ -1,0 +1,349 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input[type="number"],
+        .form-group input[type="text"],
+        .form-group select {
+            width: calc(100% - 10px);
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .form-group button {
+            padding: 8px 20px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .history-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .history-section h2 {
+            color: #007bff;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th,
+        .history-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .history-table th {
+            background-color: #f2f2f2;
+        }
+
+        /* Animation for adding points */
+        @keyframes addedPoints {
+            0% { background-color: inherit; }
+            100% { background-color: #d4edda; }
+        }
+
+        .added-points-animation {
+            animation: addedPoints 1s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+        
+        <!-- Form to add a new student -->
+        <h2>Add New Student</h2>
+        <form id="addStudentForm" onsubmit="return addStudent()">
+            <div class="form-group">
+                <label for="studentName">Name:</label>
+                <input type="text" id="studentName">
+            </div>
+            <div class="form-group">
+                <label for="studentCourse">Course:</label>
+                <input type="text" id="studentCourse">
+            </div>
+            <div class="form-group">
+                <button type="submit">Add Student</button>
+            </div>
+        </form>
+
+        <hr>
+
+        <!-- Display existing students -->
+        <h2>Existing Students</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Course</th>
+                    <th>Points</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+                <!-- Student data will be populated here -->
+            </tbody>
+        </table>
+        
+        <hr>
+        
+        <!-- Form to remove a student -->
+        <h2>Remove Student</h2>
+        <form id="removeStudentForm" onsubmit="return removeStudent()">
+            <div class="form-group">
+                <label for="removeStudentId">Student ID:</label>
+                <input type="number" id="removeStudentId">
+            </div>
+            <div class="form-group">
+                <button type="submit">Remove Student</button>
+            </div>
+        </form>
+
+        <!-- Form to update points and remarks -->
+        <h2>Update Points & Remarks</h2>
+        <form id="updatePointsForm">
+            <div class="form-group">
+                <label for="studentId">Student ID:</label>
+                <input type="number" id="studentId">
+            </div>
+            <div class="form-group">
+                <label for="points">Points:</label>
+                <input type="number" id="points">
+            </div>
+            <div class="form-group">
+                <label for="action">Action:</label>
+                <select id="action">
+                    <option value="add">Add Points</option>
+                    <option value="subtract">Subtract Points</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="remark">Remark:</label>
+                <input type="text" id="remark">
+            </div>
+            <div class="form-group">
+                <button type="button" onclick="updateStudentDetails()">Update</button>
+            </div>
+        </form>
+
+        <!-- History section -->
+        <div class="history-section">
+            <h2>History</h2>
+            <table class="history-table" id="historyTable">
+                <!-- Student history will be populated here -->
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Existing student data
+        var students = [
+            { "id": 1, "name": "John Doe", "course": "Mathematics", "points": 80, "history": [], "remark": "" },
+            { "id": 2, "name": "Alice Smith", "course": "Science", "points": 75, "history": [], "remark": "" },
+            { "id": 3, "name": "Bob Johnson", "course": "History", "points": 90, "history": [], "remark": "" }
+            // Add more students as needed
+        ];
+
+        // Function to display students
+        function displayStudents() {
+            var tableBody = document.getElementById("studentTableBody");
+            tableBody.innerHTML = "";
+
+            students.forEach(function(student) {
+                var row = "<tr>";
+                
+                row += "<td>" + student.id + "</td>";
+                row += "<td>" + student.name + "</td>";
+                row += "<td>" + student.course + "</td>";
+                row += "<td>" + student.points + "</td>";
+                row += '<td><button onclick="updateStudentDetails(' + student.id + ')" class="add-points-btn">Update</button></td>';
+                row += "</tr>";
+
+                tableBody.innerHTML += row;
+            });
+        }
+
+        // Function to add a new student
+        function addStudent() {
+            var studentName = document.getElementById("studentName").value;
+            var studentCourse = document.getElementById("studentCourse").value;
+
+            // Generate a unique ID for the new student (replace this with your ID generation logic)
+            var newStudentId = students.length + 1;
+
+            // Create the new student object
+            var newStudent = {
+                "id": newStudentId,
+                "name": studentName,
+                "course": studentCourse,
+                "points": 0, // Default points for a new student
+                "history": [], // Empty history for a new student
+                "remark": "" // Empty remark for a new student
+            };
+
+            // Add the new student to the existing list
+            students.push(newStudent);
+
+            // Display the updated list of students
+            displayStudents();
+
+            // Clear the input fields after adding the student
+            document.getElementById("studentName").value = "";
+            document.getElementById("studentCourse").value = "";
+
+            return false; // Prevent form submission
+        }
+
+        // Function to remove a student
+        function removeStudent() {
+            var removeStudentId = parseInt(document.getElementById("removeStudentId").value);
+
+            // Find the index of the student to remove
+            var index = students.findIndex(function(student) {
+                return student.id === removeStudentId;
+            });
+
+            if (index !== -1) {
+                // Remove the student from the array
+                students.splice(index, 1);
+
+                // Display the updated list of students
+                displayStudents();
+
+                // Clear the input field after removing the student
+                document.getElementById("removeStudentId").value = "";
+            } else {
+                alert("Student not found!");
+            }
+
+            return false; // Prevent form submission
+        }
+
+        // Function to update points, remarks, and display history
+        function updateStudentDetails(studentId) {
+            var points = parseInt(document.getElementById("points").value);
+            var action = document.getElementById("action").value;
+            var remark = document.getElementById("remark").value;
+
+            var student = students.find(function(student) {
+                return student.id === studentId;
+            });
+
+            if (student !== undefined) {
+                if (action === "add") {
+                    student.points += points;
+                    student.history.push({ "points": "+" + points, "remark": remark });
+                } else if (action === "subtract") {
+                    student.points -= points;
+                    student.history.push({ "points": "-" + points, "remark": remark });
+                }
+
+                displayStudents();
+                displayHistory(studentId);
+
+                // Animation for adding points
+                var updatedRow = document.querySelector('tr:nth-child(' + (studentId + 1) + ')');
+                updatedRow.classList.add('added-points-animation');
+
+                // Remove animation after 1 second
+                setTimeout(function() {
+                    updatedRow.classList.remove('added-points-animation');
+                }, 1000);
+            } else {
+                alert("Student not found!");
+            }
+        }
+
+        // Function to display history for a specific student
+        function displayHistory(studentId) {
+            var historyTable = document.getElementById("historyTable");
+            historyTable.innerHTML = "<thead><tr><th>Points</th><th>Remark</th></tr></thead><tbody>";
+
+            var student = students.find(function(student) {
+                return student.id === studentId;
+            });
+
+            student.history.forEach(function(entry) {
+                var row = "<tr>";
+                row += "<td>" + entry.points + "</td>";
+                row += "<td>" + entry.remark + "</td>";
+                row += "</tr>";
+
+                historyTable.innerHTML += row;
+            });
+
+            historyTable.innerHTML += "</tbody>";
+        }
+
+        // Display students when the page loads
+        displayStudents();
+    </script>
+</body>
+</html>

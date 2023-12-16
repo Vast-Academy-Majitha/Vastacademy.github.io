@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Login</title>
+
+  <!-- Include necessary external CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet"/>
+  <!-- Your custom CSS file if any -->
+
+  <style>
+  /* Your CSS styles for student login page */
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+  }
+
+  .container {
+    width: 80%;
+    margin: 20px auto;
+    text-align: center;
+  }
+
+  h1 {
+    margin-bottom: 20px;
+    color: #3498db;
+  }
+
+  .card {
+    width: 300px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-header {
+    background-color: #3498db;
+    color: #fff;
+    padding: 10px 0;
+    border-radius: 5px 5px 0 0;
+  }
+
+  .card-header h3 {
+    margin: 0;
+  }
+
+  .card-body {
+    padding: 20px;
+  }
+
+  label {
+    display: block;
+    text-align: left;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 10px 0;
+    margin-top: 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-primary {
+    background-color: #3498db;
+  }
+
+  .btn-primary:hover {
+    background-color: #2980b9;
+  }
+
+  #error {
+    display: block;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  a {
+    color: #3498db;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+</head>
+<body>
+  <div class="container">
+    <h1>Student Login</h1>
+    <form id="studentLoginForm" class="card">
+      <div class="card-header">
+        <h3>Login Form</h3>
+      </div>
+      <div class="card-body px-5 py-4">
+        <small><span id="error" style="color: red"></span></small>
+
+        <label class="custom-field">
+  <input id="email" type="text" placeholder="Email Id" required autocomplete="email">
+   </label>
+   <label class="custom-field">
+  <input id="password" type="password" placeholder="Password" required autocomplete="current-password">
+</label>
+
+  
+     <label>
+  <input id="rememberMe" type="checkbox"> Remember Me
+    </label>
+        <button type="submit" class="btn btn-primary">Login</button>
+        <a href="#" onclick="forgotPass()">Forgot Password?</a>
+      </div>
+    </form>
+  </div>
+ 
+
+
+  <!-- Include Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-auth.js"></script>
+
+   <script>
+    // Firebase configuration
+    var firebaseConfig = {
+      // Your Firebase config details here
+      apiKey: "AIzaSyB5-ow4YS3r98QIcfMyT4JLJJmzjDfmCbc",
+  authDomain: "authentication-608f0.firebaseapp.com",
+  projectId: "authentication-608f0",
+  storageBucket: "authentication-608f0.appspot.com",
+  messagingSenderId: "574744795723",
+  appId: "1:574744795723:web:aedc90dce5a85278a58bce",
+  measurementId: "G-EBFQEFYH2P"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+
+
+     document.getElementById('studentLoginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const rememberMe = document.getElementById('rememberMe').checked;
+
+      // Firebase authentication for students
+      auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // Successfully logged in as student
+          const user = userCredential.user;
+
+          // Check if "Remember Me" is selected
+          if (rememberMe) {
+            // Store a token or a flag in local storage to indicate that the user wants to be remembered
+            localStorage.setItem('rememberedUser', JSON.stringify({ email, password }));
+          } else {
+            // Clear the remembered user data from local storage
+            localStorage.removeItem('rememberedUser');
+          }
+
+          // Redirect to student dashboard after successful login
+          window.location.href = 'studentdashboard.html';
+        })
+        .catch((error) => {
+          // Handle login errors for students
+          const errorMessage = error.message;
+          console.error('Student login error:', errorMessage);
+          document.getElementById('error').innerText = errorMessage;
+        });
+    });
+
+    document.getElementById('studentLoginForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const rememberMe = document.getElementById('rememberMe').checked;
+
+  // Firebase authentication for students
+  auth.signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      // Successfully logged in as student
+      const user = userCredential.user;
+
+      // Check if "Remember Me" is selected
+      if (rememberMe) {
+        // Store the user's credentials in localStorage with an expiration time
+        const expirationTime = 30 * 60 * 1000; // 30 minutes in milliseconds
+        const expirationDate = new Date().getTime() + expirationTime;
+        const userCredentials = { email, password, expiration: expirationDate };
+        localStorage.setItem('rememberedUser', JSON.stringify(userCredentials));
+      }
+
+      // Redirect to student dashboard after successful login
+      window.location.href = 'studentdashboard.html';
+    })
+    .catch((error) => {
+      // Handle login errors for students
+      const errorMessage = error.message;
+      console.error('Student login error:', errorMessage);
+      document.getElementById('error').innerText = errorMessage;
+    });
+});
+
+// Check if there's a remembered user with unexpired credentials
+document.addEventListener('DOMContentLoaded', () => {
+  const rememberedUser = localStorage.getItem('rememberedUser');
+  if (rememberedUser) {
+    const userData = JSON.parse(rememberedUser);
+    const currentTime = new Date().getTime();
+    
+    // Check if credentials are not expired
+    if (currentTime < userData.expiration) {
+      // Use stored credentials for automatic login
+      auth.signInWithEmailAndPassword(userData.email, userData.password)
+        .then(() => {
+          window.location.href = 'studentdashboard.html'; // Redirect to the dashboard
+        })
+        .catch((error) => {
+          console.error('Auto-login failed:', error);
+        });
+    } else {
+      // Clear expired credentials from localStorage
+      localStorage.removeItem('rememberedUser');
+    }
+  }
+});
+
+  </script>
+
+</body>
+</html>
