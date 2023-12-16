@@ -1,1 +1,1 @@
-# Vastacademy.github.io
+# Vastacademy
